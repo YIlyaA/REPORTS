@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 import networkx as nx
 import random
 from generators import generate_directed_cyclic_graph as dc
+from generators import generate_cyclic_undirected_graph as udc
 
 
 def mkdir(directory):
@@ -14,51 +15,17 @@ def mkdir(directory):
     except FileExistsError:
         pass
 
-
-def generate_acyclic_graph_batch(test_size, output_queue):
-    num_edges = int(test_size * (test_size - 1) / 2)
-    desc = f"Generating tests for {test_size}"
-    result = generate_acyclic_graph((test_size, num_edges, desc))
-    output_queue.put((test_size, result))
-
-
-def generate_acyclic_graph(args):
-    num_nodes, num_edges, desc = args
-    graph = nx.DiGraph()
-    nodes = list(range(num_nodes))
-    graph.add_nodes_from(nodes)
-
-    edges_added = 0
-    # progress_interval = num_edges // 100  # Определяем интервал обновления прогресса
-
-    for _ in range(num_edges):
-        node_from = random.choice(nodes)
-        node_to = random.choice(nodes)
-
-        if node_from != node_to:
-            graph.add_edge(node_from, node_to)
-            edges_added += 1
-            # if edges_added % progress_interval == 0:
-            #     tqdm.write(f"{desc}: {edges_added / num_edges * 100:.2f}% complete", end='\r')
-            if not nx.is_directed_acyclic_graph(graph):
-                graph.remove_edge(node_from, node_to)
-                edges_added -= 1
-
-    # tqdm.write(f"{desc}: 100.00% complete")
-    return list(graph.edges())
-
-
 def create_tests(test_dir, test_sizes, saturations):
     if not os.path.exists(test_dir):
         os.makedirs(test_dir)
     if not os.path.exists(f"{test_dir}/DA"):  # directed acyclic
-        os.makedirs("DA")
+        os.makedirs(f"{test_dir}/DA")
     if not os.path.exists(f"{test_dir}/DC"):  # directed acyclic
-        os.makedirs("DC")
+        os.makedirs(f"{test_dir}/DC")
     if not os.path.exists(f"{test_dir}/UDA"):  # directed acyclic
-        os.makedirs("UDA")
+        os.makedirs(f"{test_dir}/UDA")
     if not os.path.exists(f"{test_dir}/UDC"):  # directed acyclic
-        os.makedirs("UDC")
+        os.makedirs(f"{test_dir}/UDC")
 
     for saturation in saturations:
         # for size in test_sizes:
@@ -86,13 +53,14 @@ def create_tests(test_dir, test_sizes, saturations):
         #         f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
         #         f.close()
         #
-        # for size in test_sizes:
-        #     result = generate_undirected_cyclic_graph(size, saturation)
-        #
-        #     with open(f'{test_dir}/{"UDC"}/{saturation}_{size}.in', 'w') as f:
-        #         f.write(f'{size} {int(size * (size - 1) / 2)}\n')
-        #         f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
-        #         f.close()
+        for size in test_sizes:
+            result = udc(size, saturation)
+
+            with open(f'{test_dir}/{"UDC"}/{saturation}_{size}.in', 'w') as f:
+                f.write(f'{size} {int(saturation / 100 * size * (size - 1) / 2)}\n')
+                if result != 0:
+                    f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+                f.close()
 
 
 def compile_sources(sources, bins, v=False):
@@ -148,28 +116,28 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     f_in.close()
                     f_out.close()
 
-                # elif "undirected" in algo:
-                #     f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
-                #     f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
-                #     f_in = open(f_in_n1, 'r')
-                #     f_out = open(f_out_n1, 'w')
-                #     command = [f'{bins}/{algo}']
-                #     subprocess.run(command, stdin=f_in, stdout=f_out)
-                #     if v:
-                #         print(command, f'in={f_in_n1}, out={f_out_n1}')
-                #     f_in.close()
-                #     f_out.close()
-                #
-                #     f_in_n2 = f'{test_dir}/UDC/{saturation}_{ts}.in'
-                #     f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
-                #     f_in = open(f_in_n2, 'r')
-                #     f_out = open(f_out_n2, 'w')
-                #     command = [f'{bins}/{algo}']
-                #     subprocess.run(command, stdin=f_in, stdout=f_out)
-                #     if v:
-                #         print(command, f'in={f_in_n2}, out={f_out_n2}')
-                #     f_in.close()
-                #     f_out.close()
+                elif "undirected" in algo:
+                    # f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
+                    # f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
+                    # f_in = open(f_in_n1, 'r')
+                    # f_out = open(f_out_n1, 'w')
+                    # command = [f'{bins}/{algo}']
+                    # subprocess.run(command, stdin=f_in, stdout=f_out)
+                    # if v:
+                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    # f_in.close()
+                    # f_out.close()
+
+                    f_in_n2 = f'{test_dir}/UDC/{saturation}_{ts}.in'
+                    f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
+                    f_in = open(f_in_n2, 'r')
+                    f_out = open(f_out_n2, 'w')
+                    command = [f'{bins}/{algo}']
+                    subprocess.run(command, stdin=f_in, stdout=f_out)
+                    if v:
+                        print(command, f'in={f_in_n2}, out={f_out_n2}')
+                    f_in.close()
+                    f_out.close()
 
 
 def read_results(results):
