@@ -2,7 +2,9 @@ import math
 
 
 def generate_directed_cyclic_graph(vertices, saturation):
-    edges = math.floor(int(saturation * (vertices * (vertices - 1))))
+    edges = math.floor(int(saturation / 100 * (vertices * (vertices - 1))))
+    if edges < vertices:
+        return 0
     edge_list = []
     for i in range(1, vertices):
         edge_list.append((i, i + 1))
@@ -23,7 +25,9 @@ def generate_directed_cyclic_graph(vertices, saturation):
 
 
 def generate_cyclic_undirected_graph(vertices, saturation):
-    edges = math.floor(int(saturation * (vertices * (vertices - 1))/2))
+    edges = math.floor(int(saturation / 100 * (vertices * (vertices - 1)) / 2))
+    if edges < vertices:
+        return "Impossible to genereate cyclic graph"
     edge_list = []
     for i in range(1, vertices):
         edge_list.append((i, i + 1))
@@ -43,16 +47,18 @@ def generate_cyclic_undirected_graph(vertices, saturation):
     return edge_list
 
 
-n = int(input())
-# edge_factor1 = 0.9
+# n = int(input())
+# edge_factor1 = 10
 # print(n, edge_factor1)
 # edges = generate_cyclic_undirected_graph(n, edge_factor1)
 # result = '\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in edges)
-# # print("Krawedzi:", result)
-
-edge_factor2 = 0.1
-print(n, edge_factor2)
-edges2 = generate_directed_cyclic_graph(n, edge_factor2)
-result1 = '\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in edges2)
-print("Krawedzi:")
-print(result1)
+# print("Krawedzi:", result)
+#
+# edge_factor2 = 10
+# edges2 = generate_directed_cyclic_graph(n, edge_factor2)
+# if edges2 == 0:
+#     print("Impossible to generate cyclic graph")
+# else:
+#     result1 = '\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in edges2)
+#     print("Krawedzi:")
+#     print(result1)

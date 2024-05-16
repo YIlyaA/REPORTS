@@ -5,6 +5,7 @@ from tqdm.notebook import tqdm
 from matplotlib import pyplot as plt
 import networkx as nx
 import random
+from generators import generate_directed_cyclic_graph as dc
 
 
 def mkdir(directory):
@@ -60,37 +61,38 @@ def create_tests(test_dir, test_sizes, saturations):
         os.makedirs("UDC")
 
     for saturation in saturations:
-        for size in test_sizes:
-            result = generate_directed_acyclic_graph(size, saturation)
+        # for size in test_sizes:
+        #         result = generate_directed_acyclic_graph(size, saturation)
+        #
+        #         with open(f'{test_dir}/{"DA"}/{saturation}_{size}.in', 'w') as f:
+        #             f.write(f'{size} {int(size * (size - 1))}\n')
+        #             f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+        #             f.close()
 
-            with open(f'{test_dir}/{"DA"}/{saturation}_{size}.in', 'w') as f:
-                f.write(f'{size} {int(size * (size - 1))}\n')
-                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
-                f.close()
-
         for size in test_sizes:
-            result = generate_directed_cyclic_graph(size, saturation)
+            result = dc(size, saturation)
 
             with open(f'{test_dir}/{"DC"}/{saturation}_{size}.in', 'w') as f:
-                f.write(f'{size} {int(size * (size - 1))}\n')
-                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+                f.write(f'{size} {int(saturation / 100 * size * (size - 1))}\n')
+                if result != 0:
+                    f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
                 f.close()
 
-        for size in test_sizes:
-            result = generate_undirected_acyclic_graph(size, saturation)
-
-            with open(f'{test_dir}/{"UDA"}/{saturation}_{size}.in', 'w') as f:
-                f.write(f'{size} {int(size * (size - 1) / 2)}\n')
-                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
-                f.close()
-
-        for size in test_sizes:
-            result = generate_undirected_cyclic_graph(size, saturation)
-
-            with open(f'{test_dir}/{"UDC"}/{saturation}_{size}.in', 'w') as f:
-                f.write(f'{size} {int(size * (size - 1) / 2)}\n')
-                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
-                f.close()
+        # for size in test_sizes:
+        #     result = generate_undirected_acyclic_graph(size, saturation)
+        #
+        #     with open(f'{test_dir}/{"UDA"}/{saturation}_{size}.in', 'w') as f:
+        #         f.write(f'{size} {int(size * (size - 1) / 2)}\n')
+        #         f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+        #         f.close()
+        #
+        # for size in test_sizes:
+        #     result = generate_undirected_cyclic_graph(size, saturation)
+        #
+        #     with open(f'{test_dir}/{"UDC"}/{saturation}_{size}.in', 'w') as f:
+        #         f.write(f'{size} {int(size * (size - 1) / 2)}\n')
+        #         f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+        #         f.close()
 
 
 def compile_sources(sources, bins, v=False):
@@ -112,28 +114,28 @@ def compile_sources(sources, bins, v=False):
 def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
     mkdir(result_dir)
     if not os.path.exists(f"{result_dir}/DA"):
-        os.makedirs("DA")
+        os.makedirs(f"{result_dir}/DA")
     if not os.path.exists(f"{result_dir}/DC"):
-        os.makedirs("DC")
+        os.makedirs(f"{result_dir}/DC")
     if not os.path.exists(f"{result_dir}/UDA"):
-        os.makedirs("UDA")
+        os.makedirs(f"{result_dir}/UDA")
     if not os.path.exists(f"{result_dir}/UDC"):
-        os.makedirs("UDC")
+        os.makedirs(f"{result_dir}/UDC")
 
     for algo in os.listdir(bins):
         for saturation in saturations:
             for ts in test_sizes:
                 if "directed" in algo:
-                    f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
-                    f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
-                    f_in = open(f_in_n1, 'r')
-                    f_out = open(f_out_n1, 'w')
-                    command = [f'{bins}/{algo}']
-                    subprocess.run(command, stdin=f_in, stdout=f_out)
-                    if v:
-                        print(command, f'in={f_in_n1}, out={f_out_n1}')
-                    f_in.close()
-                    f_out.close()
+                    # f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
+                    # f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
+                    # f_in = open(f_in_n1, 'r')
+                    # f_out = open(f_out_n1, 'w')
+                    # command = [f'{bins}/{algo}']
+                    # subprocess.run(command, stdin=f_in, stdout=f_out)
+                    # if v:
+                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    # f_in.close()
+                    # f_out.close()
 
                     f_in_n2 = f'{test_dir}/DC/{saturation}_{ts}.in'
                     f_out_n2 = f'{result_dir}/DC/{algo}_{saturation}_{ts}.out'
@@ -146,45 +148,45 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     f_in.close()
                     f_out.close()
 
-                elif "undirected" in algo:
-                    f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
-                    f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
-                    f_in = open(f_in_n1, 'r')
-                    f_out = open(f_out_n1, 'w')
-                    command = [f'{bins}/{algo}']
-                    subprocess.run(command, stdin=f_in, stdout=f_out)
-                    if v:
-                        print(command, f'in={f_in_n1}, out={f_out_n1}')
-                    f_in.close()
-                    f_out.close()
-
-                    f_in_n2 = f'{test_dir}/UDC/{saturation}_{ts}.in'
-                    f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
-                    f_in = open(f_in_n2, 'r')
-                    f_out = open(f_out_n2, 'w')
-                    command = [f'{bins}/{algo}']
-                    subprocess.run(command, stdin=f_in, stdout=f_out)
-                    if v:
-                        print(command, f'in={f_in_n2}, out={f_out_n2}')
-                    f_in.close()
-                    f_out.close()
+                # elif "undirected" in algo:
+                #     f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
+                #     f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
+                #     f_in = open(f_in_n1, 'r')
+                #     f_out = open(f_out_n1, 'w')
+                #     command = [f'{bins}/{algo}']
+                #     subprocess.run(command, stdin=f_in, stdout=f_out)
+                #     if v:
+                #         print(command, f'in={f_in_n1}, out={f_out_n1}')
+                #     f_in.close()
+                #     f_out.close()
+                #
+                #     f_in_n2 = f'{test_dir}/UDC/{saturation}_{ts}.in'
+                #     f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
+                #     f_in = open(f_in_n2, 'r')
+                #     f_out = open(f_out_n2, 'w')
+                #     command = [f'{bins}/{algo}']
+                #     subprocess.run(command, stdin=f_in, stdout=f_out)
+                #     if v:
+                #         print(command, f'in={f_in_n2}, out={f_out_n2}')
+                #     f_in.close()
+                #     f_out.close()
 
 
 def read_results(results):
-    res_DA = {'Robertsa-Floresa' : {'x': [], 'y': [], 'z': []}, 'Fleury' : {'x': [], 'y': [], 'z': []}}
-    res_UDA = {'Robertsa-Floresa' : {'x': [], 'y': [], 'z': []}, 'Fleury' : {'x': [], 'y': [], 'z': []}}
-    res_DC = {'Robertsa-Floresa' : {'x': [], 'y': [], 'z': []}, 'Fleury' : {'x': [], 'y': [], 'z': []}}
-    res_UDC = {'Robertsa-Floresa' : {'x': [], 'y': [], 'z': []}, 'Fleury' : {'x': [], 'y': [], 'z': []}}
+    res_DA = {'Robertsa-Floresa': {'x': [], 'y': [], 'z': []}, 'Fleury': {'x': [], 'y': [], 'z': []}}
+    res_UDA = {'Robertsa-Floresa': {'x': [], 'y': [], 'z': []}, 'Fleury': {'x': [], 'y': [], 'z': []}}
+    res_DC = {'Robertsa-Floresa': {'x': [], 'y': [], 'z': []}, 'Fleury': {'x': [], 'y': [], 'z': []}}
+    res_UDC = {'Robertsa-Floresa': {'x': [], 'y': [], 'z': []}, 'Fleury': {'x': [], 'y': [], 'z': []}}
     for dir in os.listdir(results):
         for file in os.listdir(f"{results}/{dir}"):
             algo, saturation, size = file.split('_')
             size = size.split('.')[0]
-            f = open(results + '/'+ dir + '/' + file, 'r')
+            f = open(results + '/' + dir + '/' + file, 'r')
             line = f.read()
             if dir == "DA":
                 res_DA['Robertsa-Floresa']['x'].append(size)
                 res_DA['Fleury']['x'].append(size)
-                time = float(line.split()[-2])    # TODO time from file
+                time = float(line.split()[-2])  # TODO time from file
                 if 'RF' in algo:
                     res_DA['Robertsa-Floresa']['y'].append(time)
                     res_DA['Robertsa-Floresa']['z'].append(float(saturation))
@@ -195,7 +197,7 @@ def read_results(results):
             if dir == "DC":
                 res_DC['Robertsa-Floresa']['x'].append(size)
                 res_DC['Fleury']['x'].append(size)
-                time = float(line.split()[-2])    # TODO time from file
+                time = float(line.split()[-2])  # TODO time from file
                 if 'RF' in algo:
                     res_DC['Robertsa-Floresa']['y'].append(time)
                     res_DC['Robertsa-Floresa']['z'].append(float(saturation))
@@ -206,7 +208,7 @@ def read_results(results):
             if dir == "UDA":
                 res_UDA['Robertsa-Floresa']['x'].append(size)
                 res_UDA['Fleury']['x'].append(size)
-                time = float(line.split()[-2])    # TODO time from file
+                time = float(line.split()[-2])  # TODO time from file
                 if 'RF' in algo:
                     res_UDA['Robertsa-Floresa']['y'].append(time)
                     res_UDA['Robertsa-Floresa']['z'].append(float(saturation))
@@ -217,7 +219,7 @@ def read_results(results):
             if dir == "UDC":
                 res_UDC['Robertsa-Floresa']['x'].append(size)
                 res_UDC['Fleury']['x'].append(size)
-                time = float(line.split()[-2])    # TODO time from file
+                time = float(line.split()[-2])  # TODO time from file
                 if 'RF' in algo:
                     res_UDC['Robertsa-Floresa']['y'].append(time)
                     res_UDC['Robertsa-Floresa']['z'].append(float(saturation))
