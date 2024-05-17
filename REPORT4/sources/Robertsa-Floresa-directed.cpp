@@ -259,6 +259,11 @@ int main() {
     for (int i = 0; i < edges; ++i) {
         int u, v;
         cin >> u >> v;
+        if (u == 0 || v == 0) {
+            cout << "0" << endl;
+            // cout << "impossible";
+            return 0;
+        }
         edgesList.push_back({ u, v });
     }
 

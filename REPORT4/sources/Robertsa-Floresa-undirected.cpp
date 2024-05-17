@@ -17,6 +17,9 @@ private:
 
 public:
     HamiltonianCycleFinder(int v) {
+        if (v > MAX_VERTICES) {
+            throw runtime_error("Number of vertices exceeds the maximum limit.");
+        }
         vertices = v;
         for (int i = 0; i < vertices; ++i) {
             for (int j = 0; j < vertices; ++j) {
@@ -26,8 +29,10 @@ public:
     }
 
     void addEdge(int u, int v) {
-        graph[u][v] = 1;
-        graph[v][u] = 1;
+        if (u >= 0 && u < vertices && v >= 0 && v < vertices) {
+            graph[u][v] = 1;
+            graph[v][u] = 1;
+        }
     }
 
     void printGraph() {
@@ -85,18 +90,23 @@ public:
 int main() {
     int vertices, edges;
     cin >> vertices >> edges;
-    // if (vertices > edges) return 0;
+
+    if (vertices > MAX_VERTICES) {
+        cout << "The number of vertices exceeds the maximum allowed (" << MAX_VERTICES << ")." << endl;
+        return 1;
+    }
+
     HamiltonianCycleFinder hcFinder(vertices);
     for (int i = 0; i < edges; ++i) {
         int u, v;
         cin >> u >> v;
         if (u == 0 || v == 0) {
             cout << "0" << endl;
-            // cout << "impossible";
             return 0;
         }
-        hcFinder.addEdge(u - 1 , v - 1);
+        hcFinder.addEdge(u - 1, v - 1);
     }
+
     auto start = chrono::high_resolution_clock::now();
     hcFinder.hamiltonianCycle();
     auto end = chrono::high_resolution_clock::now();
