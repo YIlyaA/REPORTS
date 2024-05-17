@@ -41,7 +41,9 @@ def create_tests(test_dir, test_sizes, saturations):
 
             with open(f'{test_dir}/{"DC"}/{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1))}\n')
-                if result != 0:
+                if result == "0 0":
+                    f.write("0 0\n")
+                else:
                     f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
                 f.close()
 
@@ -58,7 +60,9 @@ def create_tests(test_dir, test_sizes, saturations):
 
             with open(f'{test_dir}/{"UDC"}/{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1) / 2)}\n')
-                if result != 0:
+                if result == "0 0":
+                    f.write("0 0\n")
+                else:
                     f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
                 f.close()
 
