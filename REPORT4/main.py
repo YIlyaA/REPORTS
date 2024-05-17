@@ -7,6 +7,8 @@ import networkx as nx
 import random
 from generators import generate_undirected_hamiltonian_cyclic_graph
 from generators import generate_hamiltonian_cyclic_digraph
+from generators import generate_directed_euler_cyclic_graph
+from generators import generate_undirected_euler_cyclic_graph
 
 
 def mkdir(directory):
@@ -14,6 +16,7 @@ def mkdir(directory):
         os.mkdir(directory)
     except FileExistsError:
         pass
+
 
 def create_tests(test_dir, test_sizes, saturations):
     if not os.path.exists(test_dir):
@@ -38,13 +41,19 @@ def create_tests(test_dir, test_sizes, saturations):
 
         for size in test_sizes:
             result = generate_hamiltonian_cyclic_digraph(size, saturation)
-
-            with open(f'{test_dir}/{"DC"}/{saturation}_{size}.in', 'w') as f:
+            with open(f'{test_dir}/{"DC"}/Floresa_{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1))}\n')
                 if result == "0 0":
                     f.write("0 0\n")
                 else:
                     f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+                f.close()
+
+            # directed Euler
+            result_eul = generate_directed_euler_cyclic_graph(size, saturation)
+            with open(f'{test_dir}/{"DC"}/Fleury_{saturation}_{size}.in', 'w') as f:
+                f.write(f'{size} {int(saturation / 100 * size * (size - 1))}\n')
+                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_eul))
                 f.close()
 
         # for size in test_sizes:
@@ -57,13 +66,19 @@ def create_tests(test_dir, test_sizes, saturations):
         #
         for size in test_sizes:
             result = generate_undirected_hamiltonian_cyclic_graph(size, saturation)
-
-            with open(f'{test_dir}/{"UDC"}/{saturation}_{size}.in', 'w') as f:
+            with open(f'{test_dir}/{"UDC"}/Floresa_{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1) / 2)}\n')
                 if result == "0 0":
                     f.write("0 0\n")
                 else:
                     f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+                f.close()
+
+            # undirected Euler
+            result_ud_eul = generate_undirected_euler_cyclic_graph(size, saturation)
+            with open(f'{test_dir}/{"UDC"}/Fleury_{saturation}_{size}.in', 'w') as f:
+                f.write(f'{size} {int(saturation / 100 * size * (size - 1) / 2)}\n')
+                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_ud_eul))
                 f.close()
 
 
@@ -109,8 +124,8 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     # f_in.close()
                     # f_out.close()
 
-                    f_in_n2 = f'{test_dir}/DC/{saturation}_{ts}.in'
-                    f_out_n2 = f'{result_dir}/DC/{algo}_{saturation}_{ts}.out'
+                    f_in_n2 = f'{test_dir}/DC/Floresa_{saturation}_{ts}.in'
+                    f_out_n2 = f'{result_dir}/DC/Floresa_{algo}_{saturation}_{ts}.out'
                     f_in = open(f_in_n2, 'r')
                     f_out = open(f_out_n2, 'w')
                     command = [f'{bins}/{algo}']
@@ -132,8 +147,54 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     # f_in.close()
                     # f_out.close()
 
-                    f_in_n2 = f'{test_dir}/UDC/{saturation}_{ts}.in'
-                    f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
+                    f_in_n2 = f'{test_dir}/UDC/Floresa_{saturation}_{ts}.in'
+                    f_out_n2 = f'{result_dir}/UDC/Floresa_{algo}_{saturation}_{ts}.out'
+                    f_in2 = open(f_in_n2, 'r')
+                    f_out2 = open(f_out_n2, 'w')
+                    command = [f'{bins}/{algo}']
+                    subprocess.run(command, stdin=f_in2, stdout=f_out2)
+                    if v:
+                        print(command, f'in={f_in_n2}, out={f_out_n2}')
+                    f_in2.close()
+                    f_out2.close()
+
+                if "Fleury-directed" in algo:
+                    # f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
+                    # f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
+                    # f_in = open(f_in_n1, 'r')
+                    # f_out = open(f_out_n1, 'w')
+                    # command = [f'{bins}/{algo}']
+                    # subprocess.run(command, stdin=f_in, stdout=f_out)
+                    # if v:
+                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    # f_in.close()
+                    # f_out.close()
+
+                    f_in_n2 = f'{test_dir}/DC/Fleury_{saturation}_{ts}.in'
+                    f_out_n2 = f'{result_dir}/DC/Fleury_{algo}_{saturation}_{ts}.out'
+                    f_in2 = open(f_in_n2, 'r')
+                    f_out2 = open(f_out_n2, 'w')
+                    command = [f'{bins}/{algo}']
+                    subprocess.run(command, stdin=f_in2, stdout=f_out2)
+                    if v:
+                        print(command, f'in={f_in_n2}, out={f_out_n2}')
+                    f_in2.close()
+                    f_out2.close()
+
+                if "Fleury-undirected" in algo:
+                    # f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
+                    # f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
+                    # f_in = open(f_in_n1, 'r')
+                    # f_out = open(f_out_n1, 'w')
+                    # command = [f'{bins}/{algo}']
+                    # subprocess.run(command, stdin=f_in, stdout=f_out)
+                    # if v:
+                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    # f_in.close()
+                    # f_out.close()
+
+                    f_in_n2 = f'{test_dir}/UDC/Fleury_{saturation}_{ts}.in'
+                    f_out_n2 = f'{result_dir}/UDC/Fleury_{algo}_{saturation}_{ts}.out'
                     f_in2 = open(f_in_n2, 'r')
                     f_out2 = open(f_out_n2, 'w')
                     command = [f'{bins}/{algo}']
