@@ -5,8 +5,8 @@ from tqdm.notebook import tqdm
 from matplotlib import pyplot as plt
 import networkx as nx
 import random
-from generators import generate_directed_cyclic_graph as dc
-from generators import generate_cyclic_undirected_graph as udc
+from generators import generate_undirected_hamiltonian_cyclic_graph
+from generators import generate_hamiltonian_cyclic_digraph
 
 
 def mkdir(directory):
@@ -37,7 +37,7 @@ def create_tests(test_dir, test_sizes, saturations):
         #             f.close()
 
         for size in test_sizes:
-            result = dc(size, saturation)
+            result = generate_hamiltonian_cyclic_digraph(size, saturation)
 
             with open(f'{test_dir}/{"DC"}/{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1))}\n')
@@ -54,7 +54,7 @@ def create_tests(test_dir, test_sizes, saturations):
         #         f.close()
         #
         for size in test_sizes:
-            result = udc(size, saturation)
+            result = generate_undirected_hamiltonian_cyclic_graph(size, saturation)
 
             with open(f'{test_dir}/{"UDC"}/{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1) / 2)}\n')
@@ -93,7 +93,7 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
     for algo in os.listdir(bins):
         for saturation in saturations:
             for ts in test_sizes:
-                if "directed" in algo:
+                if "Robertsa-Floresa-directed" in algo:
                     # f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
                     # f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
                     # f_in = open(f_in_n1, 'r')
@@ -116,7 +116,7 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     f_in.close()
                     f_out.close()
 
-                elif "undirected" in algo:
+                if "Robertsa-Floresa-undirected" in algo:
                     # f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
                     # f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
                     # f_in = open(f_in_n1, 'r')
@@ -130,14 +130,14 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
 
                     f_in_n2 = f'{test_dir}/UDC/{saturation}_{ts}.in'
                     f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
-                    f_in = open(f_in_n2, 'r')
-                    f_out = open(f_out_n2, 'w')
+                    f_in2 = open(f_in_n2, 'r')
+                    f_out2 = open(f_out_n2, 'w')
                     command = [f'{bins}/{algo}']
-                    subprocess.run(command, stdin=f_in, stdout=f_out)
+                    subprocess.run(command, stdin=f_in2, stdout=f_out2)
                     if v:
                         print(command, f'in={f_in_n2}, out={f_out_n2}')
-                    f_in.close()
-                    f_out.close()
+                    f_in2.close()
+                    f_out2.close()
 
 
 def read_results(results):
