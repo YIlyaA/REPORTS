@@ -85,16 +85,16 @@ public:
 int main() {
     int vertices, edges;
     cin >> vertices >> edges;
-    if (vertices > edges) return 0;
+    // if (vertices > edges) return 0;
     HamiltonianCycleFinder hcFinder(vertices);
     for (int i = 0; i < edges; ++i) {
         int u, v;
         cin >> u >> v;
-        // if (u == 0 || v == 0) {
-        //     cout << "0" << endl;
-        //     // cout << "impossible";
-        //     return 0;
-        // }
+        if (u == 0 || v == 0) {
+            cout << "0" << endl;
+            // cout << "impossible";
+            return 0;
+        }
         hcFinder.addEdge(u - 1 , v - 1);
     }
     auto start = chrono::high_resolution_clock::now();
