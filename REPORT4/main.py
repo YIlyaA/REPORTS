@@ -9,6 +9,8 @@ from generators import generate_undirected_hamiltonian_cyclic_graph
 from generators import generate_hamiltonian_cyclic_digraph
 from generators import generate_directed_euler_cyclic_graph
 from generators import generate_undirected_euler_cyclic_graph
+from generators import generate_acyclic_undirected_graph
+from generators import generate_acyclic_directed_graph
 
 
 def mkdir(directory):
@@ -31,22 +33,22 @@ def create_tests(test_dir, test_sizes, saturations):
         os.makedirs(f"{test_dir}/UDC")
 
     for saturation in saturations:
-        # for size in test_sizes:
-        #         result = generate_directed_acyclic_graph(size, saturation)
-        #
-        #         with open(f'{test_dir}/{"DA"}/{saturation}_{size}.in', 'w') as f:
-        #             f.write(f'{size} {int(size * (size - 1))}\n')
-        #             f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
-        #             f.close()
+        for size in test_sizes:
+            result = generate_acyclic_directed_graph(size, saturation)
+            with open(f'{test_dir}/{"DA"}/{saturation}_{size}.in', 'w') as f:
+                f.write(f'{size} {int(size * (size - 1))}\n')
+                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+                f.close()
 
         for size in test_sizes:
-            result = generate_hamiltonian_cyclic_digraph(size, saturation)
+            result_f = generate_hamiltonian_cyclic_digraph(size, saturation)
             with open(f'{test_dir}/{"DC"}/Floresa_{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1))}\n')
-                if result == "0 0":
+                if result_f == "0 0":
                     f.write("0 0\n")
                 else:
-                    f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+                    f.write(
+                        '\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_f))
                 f.close()
 
             # directed Euler
@@ -56,14 +58,13 @@ def create_tests(test_dir, test_sizes, saturations):
                 f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_eul))
                 f.close()
 
-        # for size in test_sizes:
-        #     result = generate_undirected_acyclic_graph(size, saturation)
-        #
-        #     with open(f'{test_dir}/{"UDA"}/{saturation}_{size}.in', 'w') as f:
-        #         f.write(f'{size} {int(size * (size - 1) / 2)}\n')
-        #         f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
-        #         f.close()
-        #
+        for size in test_sizes:
+            result_a = generate_acyclic_undirected_graph(size, saturation)
+            with open(f'{test_dir}/{"UDA"}/{saturation}_{size}.in', 'w') as f:
+                f.write(f'{size} {int(size * (size - 1) / 2)}\n')
+                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_a))
+                f.close()
+
         for size in test_sizes:
             result = generate_undirected_hamiltonian_cyclic_graph(size, saturation)
             with open(f'{test_dir}/{"UDC"}/Floresa_{saturation}_{size}.in', 'w') as f:
@@ -78,7 +79,8 @@ def create_tests(test_dir, test_sizes, saturations):
             result_ud_eul = generate_undirected_euler_cyclic_graph(size, saturation)
             with open(f'{test_dir}/{"UDC"}/Fleury_{saturation}_{size}.in', 'w') as f:
                 f.write(f'{size} {int(saturation / 100 * size * (size - 1) / 2)}\n')
-                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_ud_eul))
+                f.write(
+                    '\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_ud_eul))
                 f.close()
 
 
@@ -113,19 +115,19 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
         for saturation in saturations:
             for ts in test_sizes:
                 if "Robertsa-Floresa-directed" in algo:
-                    # f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
-                    # f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
-                    # f_in = open(f_in_n1, 'r')
-                    # f_out = open(f_out_n1, 'w')
-                    # command = [f'{bins}/{algo}']
-                    # subprocess.run(command, stdin=f_in, stdout=f_out)
-                    # if v:
-                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
-                    # f_in.close()
-                    # f_out.close()
+                    f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
+                    f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
+                    f_in = open(f_in_n1, 'r')
+                    f_out = open(f_out_n1, 'w')
+                    command = [f'{bins}/{algo}']
+                    subprocess.run(command, stdin=f_in, stdout=f_out)
+                    if v:
+                        print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    f_in.close()
+                    f_out.close()
 
                     f_in_n2 = f'{test_dir}/DC/Floresa_{saturation}_{ts}.in'
-                    f_out_n2 = f'{result_dir}/DC/Floresa_{algo}_{saturation}_{ts}.out'
+                    f_out_n2 = f'{result_dir}/DC/{algo}_{saturation}_{ts}.out'
                     f_in = open(f_in_n2, 'r')
                     f_out = open(f_out_n2, 'w')
                     command = [f'{bins}/{algo}']
@@ -136,19 +138,19 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     f_out.close()
 
                 if "Robertsa-Floresa-undirected" in algo:
-                    # f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
-                    # f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
-                    # f_in = open(f_in_n1, 'r')
-                    # f_out = open(f_out_n1, 'w')
-                    # command = [f'{bins}/{algo}']
-                    # subprocess.run(command, stdin=f_in, stdout=f_out)
-                    # if v:
-                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
-                    # f_in.close()
-                    # f_out.close()
+                    f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
+                    f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
+                    f_in = open(f_in_n1, 'r')
+                    f_out = open(f_out_n1, 'w')
+                    command = [f'{bins}/{algo}']
+                    subprocess.run(command, stdin=f_in, stdout=f_out)
+                    if v:
+                        print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    f_in.close()
+                    f_out.close()
 
                     f_in_n2 = f'{test_dir}/UDC/Floresa_{saturation}_{ts}.in'
-                    f_out_n2 = f'{result_dir}/UDC/Floresa_{algo}_{saturation}_{ts}.out'
+                    f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
                     f_in2 = open(f_in_n2, 'r')
                     f_out2 = open(f_out_n2, 'w')
                     command = [f'{bins}/{algo}']
@@ -159,19 +161,19 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     f_out2.close()
 
                 if "Fleury-directed" in algo:
-                    # f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
-                    # f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
-                    # f_in = open(f_in_n1, 'r')
-                    # f_out = open(f_out_n1, 'w')
-                    # command = [f'{bins}/{algo}']
-                    # subprocess.run(command, stdin=f_in, stdout=f_out)
-                    # if v:
-                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
-                    # f_in.close()
-                    # f_out.close()
+                    f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
+                    f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
+                    f_in = open(f_in_n1, 'r')
+                    f_out = open(f_out_n1, 'w')
+                    command = [f'{bins}/{algo}']
+                    subprocess.run(command, stdin=f_in, stdout=f_out)
+                    if v:
+                        print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    f_in.close()
+                    f_out.close()
 
                     f_in_n2 = f'{test_dir}/DC/Fleury_{saturation}_{ts}.in'
-                    f_out_n2 = f'{result_dir}/DC/Fleury_{algo}_{saturation}_{ts}.out'
+                    f_out_n2 = f'{result_dir}/DC/{algo}_{saturation}_{ts}.out'
                     f_in2 = open(f_in_n2, 'r')
                     f_out2 = open(f_out_n2, 'w')
                     command = [f'{bins}/{algo}']
@@ -182,19 +184,19 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
                     f_out2.close()
 
                 if "Fleury-undirected" in algo:
-                    # f_in_n1 = f'{test_dir}/DA/{saturation}_{ts}.in'
-                    # f_out_n1 = f'{result_dir}/DA/{algo}_{saturation}_{ts}.out'
-                    # f_in = open(f_in_n1, 'r')
-                    # f_out = open(f_out_n1, 'w')
-                    # command = [f'{bins}/{algo}']
-                    # subprocess.run(command, stdin=f_in, stdout=f_out)
-                    # if v:
-                    #     print(command, f'in={f_in_n1}, out={f_out_n1}')
-                    # f_in.close()
-                    # f_out.close()
+                    f_in_n1 = f'{test_dir}/UDA/{saturation}_{ts}.in'
+                    f_out_n1 = f'{result_dir}/UDA/{algo}_{saturation}_{ts}.out'
+                    f_in = open(f_in_n1, 'r')
+                    f_out = open(f_out_n1, 'w')
+                    command = [f'{bins}/{algo}']
+                    subprocess.run(command, stdin=f_in, stdout=f_out)
+                    if v:
+                        print(command, f'in={f_in_n1}, out={f_out_n1}')
+                    f_in.close()
+                    f_out.close()
 
                     f_in_n2 = f'{test_dir}/UDC/Fleury_{saturation}_{ts}.in'
-                    f_out_n2 = f'{result_dir}/UDC/Fleury_{algo}_{saturation}_{ts}.out'
+                    f_out_n2 = f'{result_dir}/UDC/{algo}_{saturation}_{ts}.out'
                     f_in2 = open(f_in_n2, 'r')
                     f_out2 = open(f_out_n2, 'w')
                     command = [f'{bins}/{algo}']
@@ -206,6 +208,7 @@ def run_algo(bins, test_dir, result_dir, test_sizes, saturations, v=False):
 
 
 def read_results(results):
+    global time
     res_DA = {'Robertsa-Floresa': {'x': [], 'y': [], 'z': []}, 'Fleury': {'x': [], 'y': [], 'z': []}}
     res_UDA = {'Robertsa-Floresa': {'x': [], 'y': [], 'z': []}, 'Fleury': {'x': [], 'y': [], 'z': []}}
     res_DC = {'Robertsa-Floresa': {'x': [], 'y': [], 'z': []}, 'Fleury': {'x': [], 'y': [], 'z': []}}
@@ -215,12 +218,17 @@ def read_results(results):
             algo, saturation, size = file.split('_')
             size = size.split('.')[0]
             f = open(results + '/' + dir + '/' + file, 'r')
-            line = f.read()
+            time = 0
+            for line in f:
+                if "Time" in line:
+                    time = float(line.split(' ')[1])
             if dir == "DA":
-                res_DA['Robertsa-Floresa']['x'].append(size)
-                res_DA['Fleury']['x'].append(size)
-                time = float(line.split()[-2])  # TODO time from file
-                if 'RF' in algo:
+                if size not in res_DA['Robertsa-Floresa']['x']:
+                    res_DA['Robertsa-Floresa']['x'].append(size)
+                if size not in res_DA['Fleury']['x']:
+                    res_DA['Fleury']['x'].append(size)
+
+                if 'Robertsa-Floresa' in algo:
                     res_DA['Robertsa-Floresa']['y'].append(time)
                     res_DA['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
@@ -228,10 +236,11 @@ def read_results(results):
                     res_DA['Robertsa-Floresa']['z'].append(float(saturation))
 
             if dir == "DC":
-                res_DC['Robertsa-Floresa']['x'].append(size)
-                res_DC['Fleury']['x'].append(size)
-                time = float(line.split()[-2])  # TODO time from file
-                if 'RF' in algo:
+                if size not in res_DC['Robertsa-Floresa']['x']:
+                    res_DC['Robertsa-Floresa']['x'].append(size)
+                if size not in res_DC['Fleury']['x']:
+                    res_DC['Fleury']['x'].append(size)
+                if 'Robertsa-Floresa' in algo:
                     res_DC['Robertsa-Floresa']['y'].append(time)
                     res_DC['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
@@ -239,10 +248,11 @@ def read_results(results):
                     res_DC['Robertsa-Floresa']['z'].append(float(saturation))
 
             if dir == "UDA":
-                res_UDA['Robertsa-Floresa']['x'].append(size)
-                res_UDA['Fleury']['x'].append(size)
-                time = float(line.split()[-2])  # TODO time from file
-                if 'RF' in algo:
+                if size not in res_UDA['Robertsa-Floresa']['x']:
+                    res_UDA['Robertsa-Floresa']['x'].append(size)
+                if size not in res_UDA['Fleury']['x']:
+                    res_UDA['Fleury']['x'].append(size)
+                if 'Robertsa-Floresa' in algo:
                     res_UDA['Robertsa-Floresa']['y'].append(time)
                     res_UDA['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
@@ -250,16 +260,34 @@ def read_results(results):
                     res_UDA['Robertsa-Floresa']['z'].append(float(saturation))
 
             if dir == "UDC":
-                res_UDC['Robertsa-Floresa']['x'].append(size)
-                res_UDC['Fleury']['x'].append(size)
-                time = float(line.split()[-2])  # TODO time from file
-                if 'RF' in algo:
+                if size not in res_UDC['Robertsa-Floresa']['x']:
+                    res_UDC['Robertsa-Floresa']['x'].append(size)
+                if size not in res_UDC['Fleury']['x']:
+                    res_UDC['Fleury']['x'].append(size)
+                if 'Robertsa-Floresa' in algo:
                     res_UDC['Robertsa-Floresa']['y'].append(time)
                     res_UDC['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
                     res_UDC['Robertsa-Floresa']['y'].append(time)
                     res_UDC['Robertsa-Floresa']['z'].append(float(saturation))
             f.close()
+
+    for algorithm, values in res_DA.items():
+        for key in values:
+            values[key].sort()
+
+    for algorithm, values in res_UDA.items():
+        for key in values:
+            values[key].sort()
+
+    for algorithm, values in res_DC.items():
+        for key in values:
+            values[key].sort()
+
+    for algorithm, values in res_UDC.items():
+        for key in values:
+            values[key].sort()
+
     return res_DA, res_UDA, res_DC, res_UDC
 
 

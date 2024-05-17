@@ -1,66 +1,44 @@
 import networkx as nx
 import random
+import matplotlib.pyplot as plt
 import math
 
-def genRandomEulerS(n, sat):  # dla sąsiedztwa
-    mat = [[0] * n for _ in range(n)]
-    degsI = [0] * n
-    degsO = [0] * n
-    numEdges = n * (n - 1) * sat // 100
 
-    startEdge = random.randrange(n)
-    curEdge = startEdge
-    i = 1
-    errorCount = 0  # malutka szansa że nie zadziała dla super wysokiego nasycenia (zapędzi się w kozi róg) więc wtedy chcę wywalić
-    while i < numEdges - sat // 10 or mat[startEdge][curEdge] == 1 or curEdge == startEdge:
-        errorCount += 1
-        newEdge = random.randrange(n)
-        if errorCount > n * n * n / 2:
-            return ["fail"]
-        if newEdge == curEdge or mat[newEdge][curEdge] == 1 or mat[newEdge][curEdge] == -1 or degsI[newEdge] >= int(n) - 3 + (n % 2) or degsO[newEdge] >= int(n) - 3 + (n % 2):
-            continue
-        mat[newEdge][curEdge] = -1
-        mat[curEdge][newEdge] = 1
-        degsO[newEdge] += 1
-        degsI[curEdge] += 1
-        i += 1
-        curEdge = newEdge
+def generate_acyclic_undirected_graph(n_nodes, edge_density):
+    G = nx.Graph()
 
-    mat[startEdge][curEdge] = -1
-    mat[curEdge][startEdge] = 1
-    degsO[startEdge] += 1
-    degsI[curEdge] += 1
+    # Add nodes
+    G.add_nodes_from(range(n_nodes))
 
-    imbalanced_vertices = []
-    for v in range(n):
-        if degsI[v] != degsO[v]:
-            imbalanced_vertices.append(v)
-            print(v)
+    # Add edges
+    for i in range(n_nodes):
+        for j in range(i + 1, n_nodes):
+            if random.random() < edge_density:
+                G.add_edge(i, j)
+                # Check if adding this edge creates a cycle
+                if nx.is_connected(G.to_undirected()):
+                    # If a cycle is created, remove the edge
+                    G.remove_edge(i, j)
 
-    edge_list_representation, edges = convertMatrixToEdgeList(mat)
-    return edges
+    return list(G.edges)
 
 
-def convertMatrixToEdgeList(matrix):
-    if matrix == ["fail"]:
-        return "Failed to generate a valid Eulerian path/cycle.", []
+def generate_acyclic_directed_graph(n_nodes, edge_density):
+    G = nx.DiGraph()
 
-    n = len(matrix)
-    edges = []
+    # Add nodes
+    G.add_nodes_from(range(n_nodes))
 
-    for i in range(n):
-        for j in range(n):
-            if matrix[i][j] == 1:
-                edges.append((i, j))
+    # Add edges
+    for i in range(n_nodes):
+        for j in range(i + 1, n_nodes):
+            if random.random() < edge_density:
+                G.add_edge(i, j)
+                # Check if adding this edge creates a cycle
+                if nx.is_connected(G.to_undirected()):
+                    # If a cycle is created, remove the edge
+                    G.remove_edge(i, j)
 
-    m = len(edges)
+    return list(G.edges)
 
-    result = [f"{n} {m}"]
-    for edge in edges:
-        result.append(f"{edge[0]+1} {edge[1]+1}")
-
-    return "\n".join(result), edges
-
-
-mat = genRandomEulerS(20, 10)
-print(mat)
+generate_acyclic_undirected_graph(10, 10)
