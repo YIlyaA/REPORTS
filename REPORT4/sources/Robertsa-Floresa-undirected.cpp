@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const int MAX_VERTICES = 10;
+const int MAX_VERTICES = 200;
 
 /*******************
   UNDIRECTED GRAPH
