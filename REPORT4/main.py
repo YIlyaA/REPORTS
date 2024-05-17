@@ -326,6 +326,25 @@ def plot_graf(dictionary):
     plt.show()
 
 
+def plot_graf3D(dictionary):
+    fig = plt.figure(figsize=(12, 6))
+    ax = fig.add_subplot(111, projection='3d')
+
+    for algo in dictionary:
+        x = sorted(dictionary[algo]['x'])
+        y = sorted(dictionary[algo]['y'])
+        z = sorted(dictionary[algo]['z'])
+        ax.plot(x, y, z, label=algo)
+
+    ax.set_xlabel("ilość danych wejściowych")
+    ax.set_ylabel("milisekundy (ms)")
+    ax.set_zlabel("Nasycenie")
+    ax.set_yscale('log')
+    ax.legend()
+
+    plt.show()
+
+
 def plot_graf_method(dictionary):
     plt.figure(figsize=(12, 6))
     plt.subplot(1, 2, 1)  # 1 строка, 2 столбца, первый график
