@@ -7,6 +7,7 @@ import networkx as nx
 import random
 from generators import generate_undirected_hamiltonian_cyclic_graph
 from generators import generate_hamiltonian_cyclic_digraph
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def mkdir(directory):
@@ -233,6 +234,25 @@ def plot_graf(dictionary):
     plt.yscale('log')
     plt.legend()
     # plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+
+    plt.show()
+
+
+def plot_graf3D(dictionary):
+    fig = plt.figure(figsize=(12, 6))
+    ax = fig.add_subplot(111, projection='3d')
+
+    for algo in dictionary:
+        x = sorted(dictionary[algo]['x'])
+        y = sorted(dictionary[algo]['y'])
+        z = sorted(dictionary[algo]['z'])
+        ax.plot(x, y, z, label=algo)
+
+    ax.set_xlabel("ilość danych wejściowych")
+    ax.set_ylabel("milisekundy (ms)")
+    ax.set_zlabel("Nasycenie")
+    ax.set_yscale('log')
+    ax.legend()
 
     plt.show()
 
