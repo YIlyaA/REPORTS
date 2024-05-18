@@ -1,16 +1,14 @@
-import multiprocessing
 import os
 import subprocess
-from tqdm.notebook import tqdm
 from matplotlib import pyplot as plt
-import networkx as nx
-import random
+import numpy as np
 from generators import generate_undirected_hamiltonian_cyclic_graph
 from generators import generate_hamiltonian_cyclic_digraph
 from generators import generate_directed_euler_cyclic_graph
 from generators import generate_undirected_euler_cyclic_graph
 from generators import generate_acyclic_undirected_graph
 from generators import generate_acyclic_directed_graph
+from IPython.display import display
 
 
 def mkdir(directory):
@@ -223,53 +221,60 @@ def read_results(results):
                 if "Time" in line:
                     time = float(line.split(' ')[1])
             if dir == "DA":
-                if size not in res_DA['Robertsa-Floresa']['x']:
-                    res_DA['Robertsa-Floresa']['x'].append(size)
-                if size not in res_DA['Fleury']['x']:
-                    res_DA['Fleury']['x'].append(size)
-
+                # if size not in res_DA['Robertsa-Floresa']['x']:
+                #     res_DA['Robertsa-Floresa']['x'].append(size)
+                # if size not in res_DA['Fleury']['x']:
+                #     res_DA['Fleury']['x'].append(size)
                 if 'Robertsa-Floresa' in algo:
+                    res_DA['Robertsa-Floresa']['x'].append(int(size))
                     res_DA['Robertsa-Floresa']['y'].append(time)
                     res_DA['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
-                    res_DA['Robertsa-Floresa']['y'].append(time)
-                    res_DA['Robertsa-Floresa']['z'].append(float(saturation))
+                    res_DA['Fleury']['x'].append(int(size))
+                    res_DA['Fleury']['y'].append(time)
+                    res_DA['Fleury']['z'].append(float(saturation))
 
             if dir == "DC":
-                if size not in res_DC['Robertsa-Floresa']['x']:
-                    res_DC['Robertsa-Floresa']['x'].append(size)
-                if size not in res_DC['Fleury']['x']:
-                    res_DC['Fleury']['x'].append(size)
+                # if size not in res_DC['Robertsa-Floresa']['x']:
+                #     res_DC['Robertsa-Floresa']['x'].append(size)
+                # if size not in res_DC['Fleury']['x']:
+                #     res_DC['Fleury']['x'].append(size)
                 if 'Robertsa-Floresa' in algo:
+                    res_DC['Robertsa-Floresa']['x'].append(int(size))
                     res_DC['Robertsa-Floresa']['y'].append(time)
                     res_DC['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
-                    res_DC['Robertsa-Floresa']['y'].append(time)
-                    res_DC['Robertsa-Floresa']['z'].append(float(saturation))
+                    res_DC['Fleury']['x'].append(int(size))
+                    res_DC['Fleury']['y'].append(time)
+                    res_DC['Fleury']['z'].append(float(saturation))
 
             if dir == "UDA":
-                if size not in res_UDA['Robertsa-Floresa']['x']:
-                    res_UDA['Robertsa-Floresa']['x'].append(size)
-                if size not in res_UDA['Fleury']['x']:
-                    res_UDA['Fleury']['x'].append(size)
+                # if size not in res_UDA['Robertsa-Floresa']['x']:
+                #     res_UDA['Robertsa-Floresa']['x'].append(size)
+                # if size not in res_UDA['Fleury']['x']:
+                #     res_UDA['Fleury']['x'].append(size)
                 if 'Robertsa-Floresa' in algo:
+                    res_UDA['Robertsa-Floresa']['x'].append(int(size))
                     res_UDA['Robertsa-Floresa']['y'].append(time)
                     res_UDA['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
-                    res_UDA['Robertsa-Floresa']['y'].append(time)
-                    res_UDA['Robertsa-Floresa']['z'].append(float(saturation))
+                    res_UDA['Fleury']['x'].append(int(size))
+                    res_UDA['Fleury']['y'].append(time)
+                    res_UDA['Fleury']['z'].append(float(saturation))
 
             if dir == "UDC":
-                if size not in res_UDC['Robertsa-Floresa']['x']:
-                    res_UDC['Robertsa-Floresa']['x'].append(size)
-                if size not in res_UDC['Fleury']['x']:
-                    res_UDC['Fleury']['x'].append(size)
+                # if size not in res_UDC['Robertsa-Floresa']['x']:
+                #     res_UDC['Robertsa-Floresa']['x'].append(size)
+                # if size not in res_UDC['Fleury']['x']:
+                #     res_UDC['Fleury']['x'].append(size)
                 if 'Robertsa-Floresa' in algo:
+                    res_UDC['Robertsa-Floresa']['x'].append(int(size))
                     res_UDC['Robertsa-Floresa']['y'].append(time)
                     res_UDC['Robertsa-Floresa']['z'].append(float(saturation))
                 if 'Fleury' in algo:
-                    res_UDC['Robertsa-Floresa']['y'].append(time)
-                    res_UDC['Robertsa-Floresa']['z'].append(float(saturation))
+                    res_UDC['Fleury']['x'].append(int(size))
+                    res_UDC['Fleury']['y'].append(time)
+                    res_UDC['Fleury']['z'].append(float(saturation))
             f.close()
 
     for algorithm, values in res_DA.items():
@@ -291,88 +296,38 @@ def read_results(results):
     return res_DA, res_UDA, res_DC, res_UDC
 
 
-def plot_graf(dictionary):
-    plt.figure(figsize=(12, 6))
-    plt.subplot(1, 2, 1)  # 1 строка, 2 столбца, первый график
-    for algo in dictionary:
-        if algo == "TwM" or algo == "KwM":
-            x = sorted(dictionary[algo]['x'])
-            y = sorted(dictionary[algo]['y'])
-            # print(algo, x, y)
-            plt.plot(x, y, label=algo)
+def plot_graf3D(res, title):
+    for algorithm in res:
+        fig = plt.figure(figsize=(6, 8))  # Установка размера фигуры
+        ax = fig.add_subplot(projection='3d')
 
-    # plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2e'))
-    plt.xlabel("ilość danych wejściowych")
-    plt.ylabel("milisekundy (ms)")
-    plt.yscale('log')
-    plt.legend()
-    # plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+        x = np.array(res[algorithm]['x'])
+        y = np.array(res[algorithm]['y'])
+        z = np.array(res[algorithm]['z'])
 
-    plt.subplot(1, 2, 2)  # 1 строка, 2 столбца, второй график
-    for algo in dictionary:
-        if algo == "TwL" or algo == "KwL":
-            x = sorted(dictionary[algo]['x'])
-            y = sorted(dictionary[algo]['y'])
-            # print(algo, x, y)
-            plt.plot(x, y, label=algo)
+        # Создание сетки значений для осей X и Z
+        X_unique = np.unique(x)
+        Z_unique = np.unique(z)
+        X, Z = np.meshgrid(X_unique, Z_unique)
+        Y = np.zeros_like(X, dtype=float)
 
-    # plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2e'))
-    plt.xlabel("ilość danych wejściowych")
-    plt.ylabel("milisekundy (ms)")
-    plt.yscale('log')
-    plt.legend()
-    # plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+        # Заполнение сетки значениями Y, преобразованными в логарифмическую шкалу
+        for i in range(len(x)):
+            xi = np.where(X_unique == x[i])[0][0]
+            zi = np.where(Z_unique == z[i])[0][0]
+            Y[zi, xi] = y[i]   # Y[zi, xi] = np.log10(y[i]) if y[i] > 0 else np.nan  # Использование логарифма base 10
 
-    plt.show()
+        # Построение поверхности
+        ax.plot_surface(X, Z, Y, cmap='viridis')
 
+        ax.set_xlabel('Number of vertices (n)')
+        ax.set_ylabel('Saturation (s)')
+        # ax.set_zlabel('Log Time (log10(t))')
 
-def plot_graf3D(dictionary):
-    fig = plt.figure(figsize=(12, 6))
-    ax = fig.add_subplot(111, projection='3d')
+        plt.title(f"{title} {algorithm} Algorithm")
+        # fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+        plt.tight_layout()
+        # ax.view_init(elev=30, azim=45)
+        display(fig)
+        # plt.show()
 
-    for algo in dictionary:
-        x = sorted(dictionary[algo]['x'])
-        y = sorted(dictionary[algo]['y'])
-        z = sorted(dictionary[algo]['z'])
-        ax.plot(x, y, z, label=algo)
-
-    ax.set_xlabel("ilość danych wejściowych")
-    ax.set_ylabel("milisekundy (ms)")
-    ax.set_zlabel("Nasycenie")
-    ax.set_yscale('log')
-    ax.legend()
-
-    plt.show()
-
-
-def plot_graf_method(dictionary):
-    plt.figure(figsize=(12, 6))
-    plt.subplot(1, 2, 1)  # 1 строка, 2 столбца, первый график
-    for algo in dictionary:
-        if algo == "KwL" or algo == "KwM":
-            x = sorted(dictionary[algo]['x'])
-            y = sorted(dictionary[algo]['y'])
-            plt.plot(x, y, label=algo)
-
-    # plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2e'))
-    plt.xlabel("ilość danych wejściowych")
-    plt.ylabel("milisekundy (ms)")
-    plt.yscale('log')
-    plt.legend()
-    # plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-
-    plt.subplot(1, 2, 2)  # 1 строка, 2 столбца, второй график
-    for algo in dictionary:
-        if algo == "TwL" or algo == "TwM":
-            x = sorted(dictionary[algo]['x'])
-            y = sorted(dictionary[algo]['y'])
-            plt.plot(x, y, label=algo)
-
-    # plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2e'))
-    plt.xlabel("ilość danych wejściowych")
-    plt.ylabel("milisekundy (ms)")
-    plt.yscale('log')
-    plt.legend()
-    # plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-
-    plt.show()
