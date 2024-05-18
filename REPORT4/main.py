@@ -32,10 +32,10 @@ def create_tests(test_dir, test_sizes, saturations):
 
     for saturation in saturations:
         for size in test_sizes:
-            result = generate_acyclic_directed_graph(size, saturation)
+            result_ara = generate_acyclic_directed_graph(size, saturation)
             with open(f'{test_dir}/{"DA"}/{saturation}_{size}.in', 'w') as f:
-                f.write(f'{size} {int(size * (size - 1))}\n')
-                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result))
+                f.write(f'{size} {int(size * (size - 1)/2)}\n')
+                f.write('\n'.join(str(edge).replace("(", "").replace(")", "").replace(",", "") for edge in result_ara))
                 f.close()
 
         for size in test_sizes:
@@ -328,6 +328,6 @@ def plot_graf3D(res, title):
         # fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
         plt.tight_layout()
         # ax.view_init(elev=30, azim=45)
-        display(fig)
-        # plt.show()
+        # display(fig)
+        plt.show()
 

@@ -226,8 +226,8 @@ def generate_acyclic_undirected_graph(n_nodes, edge_density):
     G.add_nodes_from(range(n_nodes))
 
     # Add edges
-    for i in range(n_nodes):
-        for j in range(i + 1, n_nodes):
+    for i in range(1, n_nodes+1):
+        for j in range(i + 1, n_nodes+1):
             if random.random() < edge_density:
                 G.add_edge(i, j)
                 # Check if adding this edge creates a cycle
@@ -245,8 +245,8 @@ def generate_acyclic_directed_graph(n_nodes, edge_density):
     G.add_nodes_from(range(n_nodes))
 
     # Add edges
-    for i in range(n_nodes):
-        for j in range(i + 1, n_nodes):
+    for i in range(1, n_nodes + 1):
+        for j in range(i + 1, n_nodes + 1):
             if random.random() < edge_density:
                 G.add_edge(i, j)
                 # Check if adding this edge creates a cycle
